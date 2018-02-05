@@ -13,9 +13,6 @@ _use_tentative_patches=
 ### Use patches from https://marc.info/?l=linux-block&m=150797307912556&w=1
 _use_blk_mq_patches=
 
-### Use disable writeback throttling: https://marc.info/?l=linux-block&m=150486424501778&w=2
-_use_lucamiccio_patch=
-
 ### Tweak kernel options prior to a build via nconfig
 _makenconfig=
 
@@ -27,6 +24,7 @@ _makexconfig=
 
 ### Tweak kernel options prior to a build via gconfig
 _makegconfig=
+
 
 ### Running with a 100 HZ tick rate 
 _100_HZ_ticks=y
@@ -66,14 +64,14 @@ _mq_enable=
 pkgbase=linux-hurt-bfq-mq-git
 # pkgname=('linux-hurt-bfq-mq-git-kernel' 'linux-hurt-bfq-mq-git-headers' 'linux-hurt-bfq-mq-git-docs')
 _srcname=linux-rt-devel
-pkgver=4.14.15.rt12.0.g9803e4c5bd54
+pkgver=4.14.15.rt13.0.g5867b4df074c
 pkgrel=1
 arch=('x86_64')
 url="https://github.com/Algodev-github/bfq-mq/"
 license=('GPL2')
 options=('!strip')
 makedepends=('kmod' 'inetutils' 'bc' 'libelf')
-_bfq_sq_mq_ver='20180113-v2'
+_bfq_sq_mq_ver='20180205'
 _bfq_sq_mq_patch="4.14-bfq-sq-mq-git-${_bfq_sq_mq_ver}.patch"
 #_lucjanpath="https://raw.githubusercontent.com/sirlucjan/kernel-patches/master/4.14"
 _lucjanpath="https://gitlab.com/sirlucjan/kernel-patches/raw/master/4.14"
@@ -91,7 +89,6 @@ source=('git://git.kernel.org/pub/scm/linux/kernel/git/rt/linux-rt-devel.git/#br
         "${_lucjanpath}/blk-mq-v10/0056-blk-mq-SCSI-allow-to-pass-null-rq-to-scsi_prep_state_check().patch"
         "${_lucjanpath}/blk-mq-v10/0057-blk-mq-SCSI-implement-get-budget-and-put_budget-for-blk-mq.patch"
         "${_lucjanpath}/0100-Check-presence-on-tree-of-every-entity-after-every-a.patch"
-        "${_lucjanpath}/0300-Disable-writeback-throttling.patch"
         "${_gcc_path}/${_gcc_patch}"
          # the main kernel config files
         'config'
@@ -145,13 +142,11 @@ prepare() {
         msg "Fix naming schema in BFQ-SQ-MQ patch"
         sed -i -e "s|PATCHLEVEL = 15|PATCHLEVEL = 14|g" \
             -i -e "s|SUBLEVEL = 0|SUBLEVEL = 15|g" \
-            -i -e "s|EXTRAVERSION = -rc7|EXTRAVERSION =|g" \
-            -i -e "s|EXTRAVERSION = -bfq-rc7|EXTRAVERSION =|g" \
-            -i -e "s|EXTRAVERSION = -bfq-mq-rc7|EXTRAVERSION =|g" \
+            -i -e "s|EXTRAVERSION = -bfq|EXTRAVERSION =|g" \
+            -i -e "s|EXTRAVERSION =-mq|EXTRAVERSION =|g" \
             -i -e "s|NAME = Fearless Coyote|NAME = Petit Gorille|g" ../${_bfq_sq_mq_patch}
         msg "Patching source with BFQ-SQ-MQ patches"
         patch -Np1 -i ../${_bfq_sq_mq_patch}
-
         
     ### Patches related to BUG_ON(entity->tree && entity->tree != &st->active) in __bfq_requeue_entity();
         if [ -n "$_use_tentative_patches" ]; then
@@ -169,13 +164,6 @@ prepare() {
         patch -Np1 -i "$p"; done
         fi     
     
-    ### Patch from https://marc.info/?l=linux-block&m=150486424501778&w=2
-        if [ -n "$_use_lucamiccio_patch" ]; then
-        msg "Apply Luca Miccio patch"
-        for p in "${srcdir}"/0300*.patch*; do 
-        msg " $p" 
-        patch -Np1 -i "$p"; done
-        fi
     
     ### Patch source to enable more gcc CPU optimizatons via the make nconfig
         msg "Patching source with gcc patch to enable more cpus types"
@@ -479,7 +467,7 @@ for _p in ${pkgname[@]}; do
 done
 
 sha512sums=('SKIP'
-            'b19f4c6c843820822242a6da7d183f84fcab2268bc4db8c55ea3d54a49228118bfb11cba83b7639ff7a74ba22b94ad34585cebdee653f84687c98939630fc5d9'
+            '077c7cf2ea181433fee24a5fb76f8580e03497b2d8c5731461b9b101f1323dc9e3bfe664c7693fd11c1352e905d0cdd96116c6eaf57731758c79196d03b673d2'
             'e1819903787241db1fc7cf4fb7682936185c73ef7ba842f59b94f2d56ef2ceab3df42344df3cb226060c09257d98e9a861bc8f7a7debc0a9f0936022022fc3ba'
             'ca6a40800668c0fcf478bd1bc555e5a496f5259739594bf83cc4963756b7a9a0a5b406e91f760d35f1bce1268c01d779fe2a7e749eccf9412e826152a5f013ef'
             '1434cc3957ef77fb83c9385a348f36ca43a73459b8995d3061143d1d15b307f944c39abc0eb109d20869c1749348d608c58cf5b92fd81ad65cad2d362e346549'
@@ -489,7 +477,6 @@ sha512sums=('SKIP'
             '82e624f91c6609bec6ebbc284c8413e638802d3306d6e3826524631fd3a4fdaaed9a85a366e9d3deab2d1b1638f2225a64942e754145ea30da896fc3155574eb'
             '75403516c0e64e13c66602ade9ac12fd553ec811628b4bba79686e183e12a798281566dfdbbe0ba1217ebe8ee1d294a7ca904c36d7b760bcb558ddca0cb7f260'
             '0f96fa9ad784709973b32eea82075ceb3e9dc2482df6441a4607612806f069254e63508b1b562279622394e4a1fbebef1b87af8401c0b1210d5d0de9954245c8'
-            'a1ccc22354a420467fb912f822585ed4573e68f4694f02ab83d7c8e352da88be495acb3cb4c451c27ca0cf0befe5925b8734d37205bb3dfdaf86d2dedef0798f'
             '5ca7ae20245a54caa71fb570d971d6872d4e888f35c6123b93fbca16baf9a0e2500d6ec931f3906e4faecaaca9cad0d593694d9cab617efd0cb7b5fc09c0fa48'
             '158604159d7af66539e5f2416cf59c16c1b683da78b3220ed7688e6ce1e8707ab00d1e70a3f4e9425754a93b083eacfa7a3738249594a47a70eb4b3b0037957a'
             '7ad5be75ee422dda3b80edd2eb614d8a9181e2c8228cd68b3881e2fb95953bf2dea6cbe7900ce1013c9de89b2802574b7b24869fc5d7a95d3cc3112c4d27063a'
