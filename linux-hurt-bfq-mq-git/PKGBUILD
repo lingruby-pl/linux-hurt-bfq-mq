@@ -62,7 +62,7 @@ _mq_enable=
 pkgbase=linux-hurt-bfq-mq-git
 # pkgname=('linux-hurt-bfq-mq-git' 'linux-hurt-bfq-mq-git-headers' 'linux-hurt-bfq-mq-git-docs')
 _srcname=linux-rt-devel
-pkgver=4.14.24.19.0.gee6c0574c45a
+pkgver=4.14.27.21.0.gba4f591fc7d6
 pkgrel=1
 arch=('x86_64')
 url="https://github.com/Algodev-github/bfq-mq/"
@@ -72,7 +72,9 @@ makedepends=('git' 'kmod' 'inetutils' 'bc' 'libelf')
 _bfq_sq_mq_ver='20180227'
 _bfq_sq_mq_patch="4.14-bfq-sq-mq-git-${_bfq_sq_mq_ver}.patch"
 _lucjanpath="https://gitlab.com/sirlucjan/kernel-patches/raw/master/4.14"
-_gcc_path="https://raw.githubusercontent.com/sirlucjan/kernel_gcc_patch/master"
+_gcc_name="kernel_gcc_patch"
+_gcc_rel='20180310'
+_gcc_path="https://github.com/graysky2/kernel_gcc_patch/archive"
 _gcc_patch="enable_additional_cpu_optimizations_for_gcc_v4.9+_kernel_v4.13+.patch"
 
 source=('git://git.kernel.org/pub/scm/linux/kernel/git/rt/linux-rt-devel.git/#branch=linux-4.14.y-rt'
@@ -86,7 +88,7 @@ source=('git://git.kernel.org/pub/scm/linux/kernel/git/rt/linux-rt-devel.git/#br
         "${_lucjanpath}/blk-mq-v10/0056-blk-mq-SCSI-allow-to-pass-null-rq-to-scsi_prep_state_check().patch"
         "${_lucjanpath}/blk-mq-v10/0057-blk-mq-SCSI-implement-get-budget-and-put_budget-for-blk-mq.patch"
         "${_lucjanpath}/0100-Check-presence-on-tree-of-every-entity-after-every-a.patch"
-        "${_gcc_path}/${_gcc_patch}"
+        "${_gcc_name}-${_gcc_rel}.tar.gz::${_gcc_path}/${_gcc_rel}.tar.gz"
          # the main kernel config files
         'config'
          # pacman hook for depmod
@@ -128,7 +130,7 @@ prepare() {
         patch -Np1 -i ../0009-bfq-sq-mq-fix-patching-error-with-20180109.patch
         msg "Fix naming schema in BFQ-SQ-MQ patch"
         sed -i -e "s|PATCHLEVEL = 15|PATCHLEVEL = 14|g" \
-            -i -e "s|SUBLEVEL = 0|SUBLEVEL = 24|g" \
+            -i -e "s|SUBLEVEL = 0|SUBLEVEL = 27|g" \
             -i -e "s|EXTRAVERSION = -bfq|EXTRAVERSION =|g" \
             -i -e "s|EXTRAVERSION =-mq|EXTRAVERSION =|g" \
             -i -e "s|NAME = Fearless Coyote|NAME = Petit Gorille|g" ../${_bfq_sq_mq_patch}
@@ -153,8 +155,8 @@ prepare() {
     
     ### Patch source to enable more gcc CPU optimizatons via the make nconfig
         msg "Patching source with gcc patch to enable more cpus types"
-	patch -Np1 -i ../${_gcc_patch}
-
+	patch -Np1 -i ../${_gcc_name}-${_gcc_rel}/${_gcc_patch}
+	
     ### UKSM ###
 	patch -Np1 -i "${srcdir}/uksm-4.14.patch"
 
@@ -453,8 +455,8 @@ sha512sums=('SKIP'
             '82e624f91c6609bec6ebbc284c8413e638802d3306d6e3826524631fd3a4fdaaed9a85a366e9d3deab2d1b1638f2225a64942e754145ea30da896fc3155574eb'
             '75403516c0e64e13c66602ade9ac12fd553ec811628b4bba79686e183e12a798281566dfdbbe0ba1217ebe8ee1d294a7ca904c36d7b760bcb558ddca0cb7f260'
             '0f96fa9ad784709973b32eea82075ceb3e9dc2482df6441a4607612806f069254e63508b1b562279622394e4a1fbebef1b87af8401c0b1210d5d0de9954245c8'
-            '5ca7ae20245a54caa71fb570d971d6872d4e888f35c6123b93fbca16baf9a0e2500d6ec931f3906e4faecaaca9cad0d593694d9cab617efd0cb7b5fc09c0fa48'
-            '30ee0f6c98fe83e0281cdcd756f027219446f049e4b5b54890f62a602753cce855b181188cc6c1878a6f49ccc7d400368192e7b662cd77385b112b97eea47072'
+            '079e34ec7bf3ef36438c648116e24c51e00ea8608a1d8b5776164478522d6a96dcab5fe0431e8e9a6282c11a1edd177e1b68fc971a81717b297e199efc101963'
+            'db29d29e82c113fa717f33e139b3f4c5942acd6b899cda8fcb9c25f50da72ef4ed1d98bd9f2bfac4b9ad216e80d6204988e1c885c25cf11ce95389ee393455b3'
             '7ad5be75ee422dda3b80edd2eb614d8a9181e2c8228cd68b3881e2fb95953bf2dea6cbe7900ce1013c9de89b2802574b7b24869fc5d7a95d3cc3112c4d27063a'
             '4a8b324aee4cccf3a512ad04ce1a272d14e5b05c8de90feb82075f55ea3845948d817e1b0c6f298f5816834ddd3e5ce0a0e2619866289f3c1ab8fd2f35f04f44'
             '6346b66f54652256571ef65da8e46db49a95ac5978ecd57a507c6b2a28aee70bb3ff87045ac493f54257c9965da1046a28b72cb5abb0087204d257f14b91fd74'
